@@ -1,0 +1,26 @@
+Source: psmisc
+Section: admin
+Priority: optional
+Maintainer:  Craig Small <csmall@debian.org>
+Build-Depends: debhelper-compat (= 13),
+               dejagnu, gettext,
+               libncurses-dev, gettext, libselinux1-dev [linux-any]
+Standards-Version: 4.5.1
+Vcs-Browser: https://salsa.debian.org/debian/psmisc
+Vcs-Git: https://salsa.debian.org/debian/psmisc.git
+
+Package: psmisc
+Architecture: any
+Multi-Arch: foreign
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Breaks: manpages-de (<< 4.9.1-1)
+Replaces: manpages-de (<< 4.9.1-1)
+Description: utilities that use the proc file system
+ This package contains miscellaneous utilities that use the proc FS:
+ .
+  - fuser: identifies processes that are using files or sockets.
+  - killall: kills processes by name (e.g. "killall -HUP named").
+  - peekfd: shows the data traveling over a file descriptor.
+  - pstree: shows currently running processes as a tree.
+  - prtstat: print the contents of /proc/<pid>/stat
+Homepage: http://psmisc.sf.net/

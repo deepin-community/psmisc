@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+
+BINARIES='killall pslog prtstat pstree fuser peekfd'
+
+for bin in $BINARIES ; do \
+    $bin --version 2>&1 | egrep "^$bin \(PSmisc\) [0-9.]+$" ; \
+done
+
