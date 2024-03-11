@@ -1,12 +1,12 @@
 .\"
 .\" Copyright 1993-2005 Werner Almesberger
-.\"           2005-2020 Craig Small
+.\"           2005-2023 Craig Small
 .\" This program is free software; you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License as published by
 .\" the Free Software Foundation; either version 2 of the License, or
 .\" (at your option) any later version.
 .\"
-.TH FUSER 1 "2020-09-09" "psmisc" "User Commands"
+.TH FUSER 1 "2022-11-02" "psmisc" "User Commands"
 .SH NAME
 fuser \- identify processes using files or sockets
 .SH SYNOPSIS
@@ -217,8 +217,6 @@ option and only has an effect with the tcp and udp namespaces.
 Search only for IPv6 sockets.  This option must not be used with the
 .B \-4
 option and only has an effect with the tcp and udp namespaces.
-.IP \fB\-\fR
-Reset all options and set the signal back to SIGKILL.
 .SH FILES
 .TP
 /proc
@@ -277,6 +275,11 @@ The
 option only works on processes.  If the user is the kernel,
 .B fuser
 will print an advice, but take no action beyond that.
+.PP
+.B fuser
+will not see block devices mounted by processes in a different mount namespace.
+This is due to the device ID shown in the process' file descriptor table being
+from the process namespace, not fuser's; meaning it won't match.
 .SH BUGS
 .PP
 .B fuser \-m  /dev/sgX
@@ -287,10 +290,21 @@ devices it does this for too.
 The mount \fB\-m\fR option will match any file within the same device as the
 specified file, use the \fB\-M\fR option as well if you mean to specify only
 the mount point.
+.PP
+.B fuser
+will not match mapped files, such as a process' shared libraries if they are
+on a
+.BR btrfs (5)
+filesystem due to the device IDs being different for
+.BR stat (2)
+and \fI/proc/<PID>/maps\fR.
 .SH "SEE ALSO"
 .BR kill (1),
 .BR killall (1),
+.BR stat (2),
+.BR btrfs (5),
 .BR lsof (8),
+.BR mount_namespaces (7),
 .BR pkill (1),
 .BR ps (1),
 .BR kill (2).

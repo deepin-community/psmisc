@@ -2,6 +2,8 @@
  * pslog.c - print process log paths.
  *
  * Copyright (C) 2015-2017 Vito Mule'
+ * Copyright (C) 2024      Craig Small <csmall@dropbear.xyz>
+ *
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +22,10 @@
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
 #endif
 
 #include <dirent.h>
@@ -122,11 +128,13 @@ main(int argc, char const *argv[])
   if (argv[1][0] != '/') {
     if (asprintf(&fullpath, "/proc/%s/fd/", argv[1]) < 0) {
       perror ("asprintf");
+      free(linkpath);
       return 1;
     }
   } else {
     if (asprintf(&fullpath, "%s/fd/", argv[1]) < 0) {
         perror("asprintf");
+        free(linkpath);
         return 1;
     }
   }
@@ -134,6 +142,7 @@ main(int argc, char const *argv[])
   pid_dir = opendir(fullpath);
   if (!pid_dir) {
     perror("opendir");
+    free(linkpath);
     free(fullpath);
     return 1;
   }

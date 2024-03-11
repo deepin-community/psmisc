@@ -22,9 +22,25 @@ bin_PROGRAMS = \
 	       src/prtstat \
 	       src/pstree
 
+dist_man_MANS = \
+		doc/killall.1 \
+		doc/pslog.1 \
+		doc/prtstat.1 \
+		doc/pstree.1 \
+		doc/peekfd.1
+
+EXTRA_DIST = \
+	     src/signames.c \
+	     README.md \
+	     misc/git-version-gen
+
 if WANT_FUSER
   bin_PROGRAMS += src/fuser
+  dist_man_MANS += doc/fuser.1
+else
+  EXTRA_DIST += doc/fuser.1
 endif
+
 if WANT_PEEKFD_I386
   bin_PROGRAMS += src/peekfd
   AM_CPPFLAGS += -DI386
@@ -65,9 +81,9 @@ src_fuser_SOURCES = \
 		    src/fuser.h \
 		    src/lists.h
 
-if WANT_TIMEOUT_STAT
-src_fuser_SOURCES += src/timeout.c src/timeout.h
-endif
+#if HAVE_SYSCALL_STATX
+src_fuser_SOURCES += src/statx.c src/statx.h
+#endif
 src_fuser_LDADD = @LIBINTL@
 src_killall_SOURCES = src/killall.c src/comm.h src/signals.c src/signals.h src/i18n.h
 src_killall_LDADD = @LIBINTL@ @DL_LIB@
@@ -82,13 +98,12 @@ nodist_src_killall_SOURCES = signames.h
 
 BUILT_SOURCES = src/signames.h .version
 
-EXTRA_DIST = src/signames.c README.md misc/git-version-gen
 
 CLEANFILES = src/signames.h .version
 
 src/signames.h: src/signames.c Makefile src/$(am__dirstamp)
 		export LC_ALL=C ; \
-		@CPP@ -dM $< |\
+		@CPP@ @CPPFLAGS@ -dM $< |\
 		tr -s '\t ' ' ' | sort -n -k 3 | sed \
 	's:#define SIG\([A-Z][A-Z]*[0-9]*\) \([0-9][0-9]*\).*$\:{\ \2,"\1" },:p;d' | \
 		  grep -v '[0-9][0-9][0-9]' >$@ || \
@@ -110,3 +125,13 @@ dist-hook:
 get-trans:
 	rsync -Lrtvz  translationproject.org::tp/latest/psmisc/  po
 	rsync -Lrtvz  translationproject.org::tp/latest/psmisc-man/  man-po
+	rm -f man-po/man.stamp
+	make -C man-po man.stamp
+
+# Programs required for testing only
+check_PROGRAMS = \
+	src/socket_test
+
+src_socket_test_SOURCES = src/socket_test.c
+
+check: $(check_PROGRAMS) $(PROGRAMS)

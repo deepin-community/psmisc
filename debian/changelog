@@ -1,3 +1,67 @@
+psmisc (23.7-1) unstable; urgency=medium
+
+  [ Pino Toscano ]
+  * Drop the Debian menu file, and stop shipping the pixmaps for it:
+    - the Debian menu is deprecated for some years already
+    - the menu items are for a terminal, and generally GUI environments have
+      their own process listing application
+
+  [ Craig Small ]
+  * New upstream release
+    - fuser: Fallback to stat() if no statx() Closes: 1030747
+    - fuser: silently ignore EACCES when scanning proc directories
+      Closes: #1063444
+    - killall: small formatting fixes Closes: #1037231
+
+ -- Craig Small <csmall@debian.org>  Sun, 03 Mar 2024 22:45:32 +1100
+
+psmisc (23.6-2) unstable; urgency=medium
+
+  * Install fuser into /usr (DEP17 M2) Closes: #1060359
+    Thanks to Chris Hofstaedtler for the patch
+
+ -- Craig Small <csmall@debian.org>  Sat, 13 Jan 2024 13:56:53 +1100
+
+psmisc (23.6-1) unstable; urgency=medium
+
+  [ Debian Janitor ]
+  * Remove unnecessary 'Testsuite: autopkgtest' header.
+
+  [ Craig Small ]
+  * New upstream source
+  * Add more autopkgtest tests for killall and fuser
+  * killall: Fallback to kill() Closes: #1015228
+
+ -- Craig Small <csmall@debian.org>  Tue, 13 Dec 2022 16:27:51 +1100
+
+psmisc (23.5-3) unstable; urgency=medium
+
+  * killall: Add fall through for pidfd_send_signal Closes: #1015228
+  * Update standards version to 4.6.1, no changes needed.
+
+ -- Craig Small <csmall@debian.org>  Mon, 25 Jul 2022 19:21:16 +1000
+
+psmisc (23.5-2) unstable; urgency=medium
+
+  * Fix DEJAGNU workaround Closes: #1015089
+
+ -- Craig Small <csmall@debian.org>  Sun, 17 Jul 2022 21:48:01 +1000
+
+psmisc (23.5-1) unstable; urgency=medium
+
+  [ Debian Janitor ]
+  * Trim trailing whitespace.
+  * Strip unusual field spacing from debian/control.
+  * Set Homepage field in Source rather than Binary package.
+  * Set upstream metadata fields: Bug-Database, Bug-Submit, Repository,
+    Repository-Browse.
+  * Update standards version to 4.6.0, no changes needed.
+
+  [ Craig Small ]
+  * New upstream release
+
+ -- Craig Small <csmall@debian.org>  Mon, 09 May 2022 21:09:28 +1000
+
 psmisc (23.4-2) unstable; urgency=medium
 
   * replace/conflict with manpages-de Closes: #982059
@@ -518,4 +582,3 @@ psmisc (16-1) unstable; urgency=low
   * procps upstream source split this off at version 1.2
 
  -- Craig Small <csmall@debian.org>  Fri,  2 Jan 1998 11:12:00 +1100
-

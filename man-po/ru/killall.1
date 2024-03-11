@@ -1,6 +1,6 @@
 .\"
 .\" Copyright 1993-2002 Werner Almesberger
-.\"           2002-2021 Craig Small
+.\"           2002-2023 Craig Small
 .\" This program is free software; you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License as published by
 .\" the Free Software Foundation; either version 2 of the License, or
@@ -11,19 +11,16 @@
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH KILLALL 1 2021\-01\-11 psmisc "Пользовательские команды"
+.TH KILLALL 1 2023\-06\-17 psmisc "Пользовательские команды"
 .SH ИМЯ
 killall \- завершает процессы с указанным именем
 .SH ОБЗОР
 .ad l
-\fBkillall\fP [\fB\-Z\fP,\fB\ \-\-context\fP \fIpattern\fP] [\fB\-e\fP,\fB\ \-\-exact\fP] [\fB\-g\fP,\fB\ \-\-process\-group\fP] [\fB\-i\fP,\fB\ \-\-interactive\fP] [\fB\-n\fP,\fB\ \-\-ns\fP \fIPID\fP]
-[\fB\-o\fP,\fB\ \-\-older\-than\fP \fITIME\fP] [\fB\-q\fP,\fB\ \-\-quiet\fP] [\fB\-r\fP,\fB\ \-\-regexp\fP]
-[\fB\-s\fP,\fB\ \-\-signal\fP \fISIGNAL\fP,\ \fB\-\fP\fISIGNAL\fP] [\fB\-u\fP,\fB\ \-\-user\fP \fIuser\fP]
-[\fB\-v\fP,\fB\ \-\-verbose\fP] [\fB\-w\fP,\fB\ \-\-wait\fP] [\fB\-y\fP,\fB\ \-\-younger\-than\fP
-\fITIME\fP] [\fB\-I\fP,\fB\ \-\-ignore\-case\fP] [\fB\-V\fP,\fB\ \-\-version\fP] [\fB\-\-\fP] \fIname\fP
-\&...
+\fBkillall\fP [\fB\-Z\fP,\fB\ \-\-context\fP \fIшаблон\fP] [\fB\-e\fP,\fB\ \-\-exact\fP] [\fB\-g\fP,\fB\ \-\-process\-group\fP] [\fB\-i\fP,\fB\ \-\-interactive\fP] [\fB\-n\fP,\fB\ \-\-ns\fP \fIPID\fP]
+[\fB\-o\fP,\fB\ \-\-older\-than\fP \fIВРЕМЯ\fP] [\fB\-q\fP,\fB\ \-\-quiet\fP] [\fB\-r\fP,\fB\ \-\-regexp\fP] [\fB\-s\fP,\fB\ \-\-signal\fP \fIСИГНАЛ\fP,\ \fB\-\fP\fIСИГНАЛ\fP] [\fB\-u\fP,\fB\ \-\-user\fP \fIпользователь\fP] [\fB\-v\fP,\fB\ \-\-verbose\fP] [\fB\-w\fP,\fB\ \-\-wait\fP]
+[\fB\-y\fP,\fB\ \-\-younger\-than\fP \fIВРЕМЯ\fP] [\fB\-I\fP,\fB\ \-\-ignore\-case\fP] [\fB\-V\fP,\ \-\-version] [\fB\-\-\fP] \fIимя\fP …
 .br
-\fBkillall\fP \-l
+\fBkillall\fP \fB\-l\fP, \fB\-\-list\fP
 .br
 \fBkillall\fP \fB\-V\fP,\fB\ \-\-version\fP
 .ad b
@@ -31,8 +28,8 @@ killall \- завершает процессы с указанным имене�
 \fBkillall\fP посылает сигнал всем процессам, выполняющим любую указанную
 команду. Если не указано имя сигнала, то используется SIGTERM.
 .PP
-Сигналы можно задавать именем (например, \fB\-HUP\fP или \fB\-SIGHUP\fP), номером
-(например, \fB\-1\fP) или в параметре \fB\-s\fP.
+Signals can be specified either by name (e.g.\& \fB\-HUP\fP or \fB\-SIGHUP\fP)  or
+by number (e.g.\& \fB\-1\fP)  or by option \fB\-s\fP.
 .PP
 Если имя команды не является регулярным выражением (параметр \fB\-r\fP) и
 содержит косую черту (\fB/\fP), то процессы, выполняющие этот определённый
@@ -76,7 +73,7 @@ s,m,h,d,w,M,y (секунды, минуты, часы, дни, недели, м�
 .IP "\fB\-r\fP, \fB\-\-regexp\fP"
 Рассматривать шаблон имени процесса как расширенное регулярное выражение
 POSIX согласно \fBregex\fP(3).
-.IP "\fB\-s\fP, \fB\-\-signal\fP, \fB\-\fP\fISIGNAL\fP"
+.IP "\fB\-s\fP, \fB\-\-signal\fP, \fB\-\fP\fIСИГНАЛ\fP"
 Посылать указанный СИГНАЛ, а не SIGTERM.
 .IP "\fB\-u\fP, \fB\-\-user\fP"
 Завершить процессы, принадлежащие указанному пользователю. Имена команд
@@ -96,9 +93,10 @@ POSIX согласно \fBregex\fP(3).
 s,m,h,d,w,M,y (секунды, минуты, часы, дни, недели, месяцы и года,
 соответственно).
 .IP "\fB\-Z\fP, \fB\-\-context\fP"
-Specify security context: kill only processes having security context that
-match with given extended regular expression pattern.  Must precede other
-arguments on the command line.  Command names are optional.
+Задать контекст безопасности: завершать только процессы с контекстом
+безопасности, который совпадает с заданным шаблоном расширенного регулярного
+выражения. В командной строке должен указываться раньше остальных
+параметров. Имена команд необязательны.
 .SH ФАЙЛЫ
 .TP 
 /proc

@@ -1,0 +1,61 @@
+#!/bin/sh
+
+exec 2>&1
+
+test_no_arguments() {
+    ( killall >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "exit value" "1" "${rtrn}"
+    grep -E '^Usage: killall \[OPTION\]' "${stderrF}" > /dev/null
+    assertTrue 'error message' $?
+}
+
+test_list_signals() {
+    ( killall -l >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "exit value" "0" "${rtrn}"
+    grep -qE '^([A-Z12]+\s*)+$' "${stdoutF}"
+    assertTrue 'STDOUT lists signals' $?
+}
+
+test_not_found() {
+    ( killall  "${fakeproc}" >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "exit value" "1" "${rtrn}"
+    th_assertNoProcFound 'STDOUT says no process found'
+}
+
+test_all_signals() {
+    allSIGNALS=$(killall -l)
+    for signame in ${allSIGNALS}; do
+	( killall -"${signame}" "${fakeproc}" >"${stdoutF}" 2>"${stderrF}" )
+	th_assertNoProcFound "STDOUT no process found for -${signame}"
+	( killall -"SIG${signame}" "${fakeproc}" >"${stdoutF}" 2>"${stderrF}" )
+	th_assertNoProcFound "STDOUT no process found for -SIG${signame}"
+    done
+}
+
+th_assertNoProcFound() {
+    msg=$1
+    grep -qE "^${fakeproc}: no process found$" "${stderrF}"
+    assertTrue "${msg}" $?
+}
+
+oneTimeSetUp() {
+  # Define global variables for command output.
+  stdoutF="${AUTOPKGTEST_TMP}/stdout"
+  stderrF="${AUTOPKGTEST_TMP}/stderr"
+  fakeproc="fakename-test"
+}
+
+setUp() {
+  # Truncate the output files.
+  cp /dev/null "${stdoutF}"
+  cp /dev/null "${stderrF}"
+}
+
+# shellcheck disable=SC1091
+. shunit2

@@ -1,6 +1,6 @@
 .\"
 .\" Copyright 1993-2005 Werner Almesberger
-.\"           2005-2020 Craig Small
+.\"           2005-2023 Craig Small
 .\" This program is free software; you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License as published by
 .\" the Free Software Foundation; either version 2 of the License, or
@@ -11,7 +11,7 @@
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH FUSER 1 "9 de setembro de 2020" psmisc "Comandos de usuário"
+.TH FUSER 1 2022\-11\-02 psmisc "Comandos de usuário"
 .SH NOME
 fuser \- identifica processos usando arquivos ou soquetes
 .SH SINOPSE
@@ -155,8 +155,6 @@ Pesquisa apenas soquetes IPv4. Esta opção não deve ser usada com a opção
 \fB\-6\fP, \fB\-\-ipv6\fP
 Pesquisa apenas soquetes IPv6. Esta opção não deve ser usada com a opção
 \fB\-4\fP e só tem efeito com os espaços de nomes tcp e udp.
-.IP \fB\-\fP
-Redefine todas as opções e defina o sinal de volta para SIGKILL.
 .SH ARQUIVOS
 .TP 
 /proc
@@ -200,6 +198,11 @@ Os acessos pelo kernel são mostrados apenas com a opção \fB\-v\fP.
 .PP
 A opção \fB\-k\fP funciona apenas em processos. Se o usuário for o kernel,
 \fBfuser\fP imprimirá um conselho, mas não fará nada além disso.
+.PP
+\fBfuser\fP will not see block devices mounted by processes in a different
+mount namespace.  This is due to the device ID shown in the process' file
+descriptor table being from the process namespace, not fuser's; meaning it
+won't match.
 .SH BUGS
 .PP
 \fBfuser \-m /dev/sgX\fP vai mostrar (ou matar com o sinalizador \fB\-k\fP) todos os
@@ -209,5 +212,10 @@ haver outros dispositivos para os quais ele também faz isso.
 A opção de montagem \fB\-m\fP vai corresponder a qualquer arquivo dentro do
 mesmo dispositivo que o arquivo especificado, use a opção \fB\-M\fP também se
 você pretende especificar apenas o ponto de montagem.
+.PP
+\fBfuser\fP will not match mapped files, such as a process' shared libraries if
+they are on a \fBbtrfs\fP(5)  filesystem due to the device IDs being different
+for \fBstat\fP(2)  and \fI/proc/<PID>/maps\fP.
 .SH "VEJA TAMBÉM"
-\fBkill\fP(1), \fBkillall\fP(1), \fBlsof\fP(8), \fBpkill\fP(1), \fBps\fP(1), \fBkill\fP(2).
+\fBkill\fP(1), \fBkillall\fP(1), \fBstat\fP(2), \fBbtrfs\fP(5), \fBlsof\fP(8),
+\fBmount_namespaces\fP(7), \fBpkill\fP(1), \fBps\fP(1), \fBkill\fP(2).
