@@ -11,14 +11,14 @@
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH PSTREE 1 2021\-01\-05 psmisc "Dienstprogramme für Benutzer"
+.TH PSTREE 1 "21. Juni 2021" psmisc "Dienstprogramme für Benutzer"
 .SH BEZEICHNUNG
 pstree \- Prozesse in einer Baumansicht anzeigen
 .SH ÜBERSICHT
 .ad l
-\fBpstree\fP [\fB\-a\fP,\fB\ \-\-arguments\fP] [\fB\-c\fP,\fB\ \-\-compact\-not\fP] [\fB\-C\fP,\fB\ \-\-color\ \fP\fIattr\fP] [\fB\-g\fP,\fB\ \-\-show\-pgids\fP] [\fB\-h\fP,\fB\ \-\-highlight\-all\fP,\fB\ \-H\fP\fI\ pid\fP,\fB\ \-\-highlight\-pid\ \fP\fIpid\fP] [\fB\-l\fP,\fB\ \-\-long\fP] [\fB\-n\fP,\fB\ \-\-numeric\-sort\fP] [\fB\-N\fP,\fB\ \-\-ns\-sort\ \fP\fIns\fP] [\fB\-p\fP,\fB\ \-\-show\-pids\fP]
-[\fB\-s\fP,\fB\ \-\-show\-parents\fP] [\fB\-S\fP,\fB\ \-\-ns\-changes\fP] [\fB\-t\fP,\fB\ \-\-thread\-names\fP] [\fB\-T\fP,\fB\ \-\-hide\-threads\fP] [\fB\-u\fP,\fB\ \-\-uid\-changes\fP]
-[\fB\-Z\fP,\fB\ \-\-security\-context\fP] [\fB\-A\fP,\fB\ \-\-ascii\fP,\fB\ \-G\fP,\fB\ \-\-vt100\fP,\fB\ \-U\fP,\fB\ \-\-unicode\fP] [\fIpid\fP,\fB\ \fP\fIuser\fP]
+\fBpstree\fP [\fB\-a\fP,\fB\ \-\-arguments\fP] [\fB\-c\fP,\fB\ \-\-compact\-not\fP] [\fB\-C\fP,\fB\ \-\-color\ \fP\fIAttribut\fP] [\fB\-g\fP,\fB\ \-\-show\-pgids\fP] [\fB\-h\fP,\fB\ \-\-highlight\-all\fP,\fB\ \-H\fP\fI\ PID\fP,\fB\ \-\-highlight\-pid\ \fP\fIPID\fP] [\fB\-l\fP,\fB\ \-\-long\fP] [\fB\-n\fP,\fB\ \-\-numeric\-sort\fP] [\fB\-N\fP,\fB\ \-\-ns\-sort\ \fP\fINamensraum\fP]
+[\fB\-p\fP,\fB\ \-\-show\-pids\fP] [\fB\-s\fP,\fB\ \-\-show\-parents\fP] [\fB\-S\fP,\fB\ \-\-ns\-changes\fP] [\fB\-t\fP,\fB\ \-\-thread\-names\fP] [\fB\-T\fP,\fB\ \-\-hide\-threads\fP]
+[\fB\-u\fP,\fB\ \-\-uid\-changes\fP] [\fB\-Z\fP,\fB\ \-\-security\-context\fP] [\fB\-A\fP,\fB\ \-\-ascii\fP,\fB\ \-G\fP,\fB\ \-\-vt100\fP,\fB\ \-U\fP,\fB\ \-\-unicode\fP] [\fIPID\fP,\fB\ \fP\fIBenutzer\fP]
 .br
 \fBpstree\fP \fB\-V\fP,\fB\ \-\-version\fP
 .ad b
@@ -77,14 +77,15 @@ verwendet ASCII\-Zeichen zum Darstellen des Baums.
 deaktiviert die Verdichtung identischer Unterbäume. Standardmäßig werden
 Unterbäume verdichtet, wo immer es möglich ist.
 .IP \fB\-C\fP
-Color the process name by given attribute. Currently \fBpstree\fP only accepts
-the value \fBage\fP which colors by process age.  Processes newer than 60
-seconds are green, newer than an hour yellow and the remaining red.
+stellt den Prozessnamen anhand des angegebenen Attributs farbig
+dar. Gegenwärtig unterstützt \fBpstree\fP nur den Wert \fBage\fP, wodurch nach
+Alter des Prozesses eingefärbt wird. Prozesse, die jünger als 60 Sekunden
+sind, werden grün, Prozesse, die jünger als eine Stunde sind, gelb und die
+übrigen rot dargestellt.
 .IP \fB\-g\fP
 zeigt Prozessgruppenkennungen (PGIDs) an. Die PGIDs werden als Dezimalzahlen
-in Klammern nach jedem der Prozessnamen angezeigt. \fB\-g\fP deaktiviert die
-Verdichtung implizit. Falls sowohl PIDs als auch PGIDs angezeigt werden,
-erscheinen die PIDs zuerst.
+in Klammern nach jedem der Prozessnamen angezeigt. Falls sowohl PIDs als
+auch PGIDs angezeigt werden, erscheinen die PIDs zuerst.
 .IP \fB\-G\fP
 verwendet VT100\-Zeichen zum Darstellen von Linien.
 .IP \fB\-h\fP
@@ -128,14 +129,13 @@ seines Elternprozesses unterscheidet, wird die neue UID in Klammern nach dem
 Prozessnamen angezeigt.
 .IP \fB\-U\fP
 verwendet UTF\-8\-Zeichen (Unicode) zum Darstellen der Linien. Unter Linux
-1.1\-54 und neueren Versionen können Sie auf der Konsole mit \fBecho \-e
-\&'\033%8'\fP in den UTF\-8\-Modus wechseln und diesen mit \fBecho \-e '\033%@'\fP
+1.1\-54 und neueren Versionen können Sie auf der Konsole mit \fBecho \-e \&'\033%8'\fP in den UTF\-8\-Modus wechseln und diesen mit \fBecho \-e '\033%@'\fP
 wieder verlassen.
 .IP \fB\-V\fP
 zeigt Versionsinformationen an.
 .IP \fB\-Z\fP
-Show the current security attributes of the process. For SELinux systems
-this will be the security context.
+zeigt die aktuellen Sicherheitsattribute des Prozesses an. Für
+SELinux\-Systeme wird dies der Sicherheitskontext sein.
 .SH DATEIEN
 .TP 
 /proc

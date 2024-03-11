@@ -11,14 +11,14 @@
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH PSTREE 1 2021\-01\-05 psmisc "Команди користувача"
+.TH PSTREE 1 "21 червня 2021 року" psmisc "Команди користувача"
 .SH НАЗВА
 pstree — програма для показу ієрархії процесів
 .SH "КОРОТКИЙ ОПИС"
 .ad l
-\fBpstree\fP [\fB\-a\fP,\fB\ \-\-arguments\fP] [\fB\-c\fP,\fB\ \-\-compact\-not\fP] [\fB\-C\fP,\fB\ \-\-color\ \fP\fIattr\fP] [\fB\-g\fP,\fB\ \-\-show\-pgids\fP] [\fB\-h\fP,\fB\ \-\-highlight\-all\fP,\fB\ \-H\fP\fI\ pid\fP,\fB\ \-\-highlight\-pid\ \fP\fIpid\fP] [\fB\-l\fP,\fB\ \-\-long\fP] [\fB\-n\fP,\fB\ \-\-numeric\-sort\fP] [\fB\-N\fP,\fB\ \-\-ns\-sort\ \fP\fIns\fP] [\fB\-p\fP,\fB\ \-\-show\-pids\fP]
-[\fB\-s\fP,\fB\ \-\-show\-parents\fP] [\fB\-S\fP,\fB\ \-\-ns\-changes\fP] [\fB\-t\fP,\fB\ \-\-thread\-names\fP] [\fB\-T\fP,\fB\ \-\-hide\-threads\fP] [\fB\-u\fP,\fB\ \-\-uid\-changes\fP]
-[\fB\-Z\fP,\fB\ \-\-security\-context\fP] [\fB\-A\fP,\fB\ \-\-ascii\fP,\fB\ \-G\fP,\fB\ \-\-vt100\fP,\fB\ \-U\fP,\fB\ \-\-unicode\fP] [\fIpid\fP,\fB\ \fP\fIuser\fP]
+\fBpstree\fP [\fB\-a\fP,\fB\ \-\-arguments\fP] [\fB\-c\fP,\fB\ \-\-compact\-not\fP] [\fB\-C\fP,\fB\ \-\-color\ \fP\fIатрибут\fP] [\fB\-g\fP,\fB\ \-\-show\-pgids\fP] [\fB\-h\fP,\fB\ \-\-highlight\-all\fP,\fB\ \-H\fP\fI\ pid\fP,\fB\ \-\-highlight\-pid\ \fP\fIpid\fP] [\fB\-l\fP,\fB\ \-\-long\fP] [\fB\-n\fP,\fB\ \-\-numeric\-sort\fP] [\fB\-N\fP,\fB\ \-\-ns\-sort\ \fP\fIчу\fP]
+[\fB\-p\fP,\fB\ \-\-show\-pids\fP] [\fB\-s\fP,\fB\ \-\-show\-parents\fP] [\fB\-S\fP,\fB\ \-\-ns\-changes\fP] [\fB\-t\fP,\fB\ \-\-thread\-names\fP] [\fB\-T\fP,\fB\ \-\-hide\-threads\fP]
+[\fB\-u\fP,\fB\ \-\-uid\-changes\fP] [\fB\-Z\fP,\fB\ \-\-security\-context\fP] [\fB\-A\fP,\fB\ \-\-ascii\fP,\fB\ \-G\fP,\fB\ \-\-vt100\fP,\fB\ \-U\fP,\fB\ \-\-unicode\fP] [\fIpid\fP,\fB\ \fP\fIкористувач\fP]
 .br
 \fBpstree\fP \fB\-V\fP,\fB\ \-\-version\fP
 .ad b
@@ -75,14 +75,14 @@ pstree — програма для показу ієрархії процесі�
 Вимкнути ущільнення для ідентичних гілок ієрархії. Типово, програма ущільнює
 гілки, якщо це можливо.
 .IP \fB\-C\fP
-Color the process name by given attribute. Currently \fBpstree\fP only accepts
-the value \fBage\fP which colors by process age.  Processes newer than 60
-seconds are green, newer than an hour yellow and the remaining red.
+Розфарбувати назви процесів за заданими атрибутами. У поточній версії
+\fBpstree\fP передбачено підтримку лише значення \fBage\fP, використання якого
+розфарбовує процеси за віком. Процеси, які є новішими за 60 секунд, буде
+показано зеленим, новіші за годину — жовтим, а решту — червоним кольором.
 .IP \fB\-g\fP
 Показувати PGID. Ідентифікатори груп процесів (PGID) буде показано у форматі
-десяткових чисел у дужках після кожної назви процесу. \fB\-g\fP неявним чином
-вимикає ущільнення. Якщо має бути показано одночасно PID та PGID, PID буде
-показано першими.
+десяткових чисел у дужках після кожної назви процесу. Якщо має бути показано
+одночасно PID та PGID, PID буде показано першими.
 .IP \fB\-G\fP
 Використовувати для малювання ліній символи VT100.
 .IP \fB\-h\fP
@@ -124,13 +124,12 @@ seconds are green, newer than an hour yellow and the remaining red.
 .IP \fB\-U\fP
 Використовувати для малювання ліній символи UTF\-8 (Unicode). У Linux 1.1\-54
 і новіших версіях увійти до режиму UTF\-8 у консолі можна за допомогою
-команди \fBecho \-e '\033%8'\fP, а вийти — за допомогою команди \fBecho \-e
-\&'\033%@'\fP.
+команди \fBecho \-e '\033%8'\fP, а вийти — за допомогою команди \fBecho \-e \&'\033%@'\fP.
 .IP \fB\-V\fP
 Показати інформацію щодо версії.
 .IP \fB\-Z\fP
-Show the current security attributes of the process. For SELinux systems
-this will be the security context.
+Показувати поточні атрибути захисту процесу. Для систем SELinux це буде
+контекст безпеки.
 .SH ФАЙЛИ
 .TP 
 /proc

@@ -1,3 +1,30 @@
+Changes in 23.7
+===============
+	* build-sys: Make disable-statx work
+	* fuser: Fallback to stat() if no statx() Debian 1030747 #48
+	* fuser: silently ignore EACCES when scanning proc directories
+	* killall: small formatting fixes Debian #1037231
+	* pstree: Do not assume root PID #49
+	* pslog: include config.h #51 !36
+	* misc: Update gettext to 0.21
+
+Changes in 23.6
+===============
+        * buildsys: Fix DEJAGNU work-around Debian #1015089
+	* killall: Use kill if pidfd_send_signal fails Debian #1015228
+	* fuser: Do not mention nonexistent - reset option #42
+	* fuser: Use modern statn where possible
+	* pstree: Better AppArmor support !30
+
+Changes in 23.5
+===============
+	* killall: Check truncated names !28
+	* killall: Use openat and pidfd_send_signal #37
+	* killall: Don't check paths of sockets #35
+        * pstree: Check for process with show_parents #38
+	* pstree: Don't disable compaction with show pgids #34
+	* pstree: Fix storage leak !29
+
 Changes in 23.4
 ===============
         * killall: Dynamically link to selinux and use security attributes
@@ -220,7 +247,7 @@ Changes in 22.7
 	* Updated Polish, Russian, Swedish and Indonesian PO files
 
 2009-04-26 Craig Small
-	* Changed fuser.1 so signal is SIGNAL to reduce confusion about wether
+	* Changed fuser.1 so signal is SIGNAL to reduce confusion about whether
 	  or not it is a parameter Debian #517413
 	* fuser.1 references pkill(1) Debian #517414
 

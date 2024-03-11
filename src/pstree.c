@@ -2,7 +2,7 @@
  * pstree.c - display process tree
  *
  * Copyright (C) 1993-2002 Werner Almesberger
- * Copyright (C) 2002-2020 Craig Small <csmall@dropbear.xyz>
+ * Copyright (C) 2002-2024 Craig Small <csmall@dropbear.xyz>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@
 #include <getopt.h>
 #include <pwd.h>
 #include <dirent.h>
+#include <errno.h>
 #include <curses.h>
 #include <term.h>
 #include <termios.h>
@@ -50,18 +51,25 @@
 #ifdef WITH_SELINUX
 #include <dlfcn.h>
 #include <selinux/selinux.h>
-#else
+#endif /*WITH_SELINUX */
+
+#ifdef WITH_APPARMOR
+#include <dlfcn.h>
+#include <sys/apparmor.h>
+#endif /* WITH_APPARMOR */
+
+#if !defined(WITH_SELINUX) && !defined(WITH_APPARMOR)
 typedef void* security_context_t; /* DUMMY to remove most ifdefs */
-#endif                                /*WITH_SELINUX */
+#endif /* !WITH_SELINUX && !WITH_APPARMOR  */
 
 extern const char *__progname;
 
 #define PROC_BASE    "/proc"
 
 #if defined(__FreeBSD_kernel__) || defined(__FreeBSD__)
-#define ROOT_PID 0
+#define DEFAULT_ROOT_PID 0
 #else
-#define ROOT_PID 1
+#define DEFAULT_ROOT_PID 1
 #endif /* __FreeBSD__ */
 
 /* UTF-8 defines by Johan Myreen, updated by Ben Winslow */
@@ -192,6 +200,20 @@ static int dumped = 0;                /* used by dump_by_user */
 static int charlen = 0;                /* length of character */
 static enum color_type color_highlight = COLOR_NONE;
 
+/*
+ * Find the root PID.
+ * Check to see if PID 0 exists, such as in LXC
+ * Otherwise return 0 for BSD, 1 for others
+ */
+static pid_t find_root_pid(void)
+{
+    struct stat s;
+
+    if (stat(PROC_BASE "/0", &s) == 0)
+        return 0;
+    return DEFAULT_ROOT_PID;
+}
+
 const char *get_ns_name(enum ns_type id) {
     if (id >= NUM_NS)
         return NULL;
@@ -311,7 +333,7 @@ static void sort_by_namespace(PROC *r, enum ns_type id, struct ns_entry **root)
     }
 }
 
-static void fix_orphans(void);
+static void fix_orphans(const pid_t root_pid);
 
 /*
  * Determine the correct output width, what we use is:
@@ -465,61 +487,110 @@ static int out_int(int x)
     return digits;
 }
 
+#ifdef WITH_SELINUX
+static bool out_selinux_context(const PROC *current)
+{
+    static void (*my_freecon)(char*) = 0;
+    static int (*my_getpidcon)(pid_t pid, char **context) = 0;
+    static int (*my_is_selinux_enabled)(void) = 0;
+    static int selinux_enabled = 0;
+    static int tried_load = 0;
+    bool ret = false;
+    char *context;
+
+    if (!my_getpidcon && !tried_load) {
+        void *handle = dlopen("libselinux.so.1", RTLD_NOW);
+        if (handle) {
+            my_freecon = dlsym(handle, "freecon");
+            if (dlerror())
+                my_freecon = 0;
+            dlerror();
+            my_getpidcon = dlsym(handle, "getpidcon");
+            if (dlerror())
+                my_getpidcon = 0;
+            my_is_selinux_enabled = dlsym(handle, "is_selinux_enabled");
+            if (dlerror())
+                my_is_selinux_enabled = 0;
+            else
+                selinux_enabled = my_is_selinux_enabled();
+        }
+        tried_load++;
+    }
+    if (my_getpidcon && selinux_enabled && !my_getpidcon(current->pid, &context)) {
+        out_string(context);
+        my_freecon(context);
+        ret = true;
+    }
+    return ret;
+}
+#endif /* WITH_SELINUX */
+
+#ifdef WITH_APPARMOR
+static bool out_apparmor_context(const PROC *current)
+{
+    static int (*my_aa_gettaskcon)(pid_t pid, char **context, char **mode) = 0;
+    static int (*my_aa_is_enabled)(void) = 0;
+    static int apparmor_enabled = 0;
+    static int tried_load = 0;
+    bool ret = false;
+    char *context;
+
+    if (!my_aa_gettaskcon && !tried_load) {
+        void *handle = dlopen("libapparmor.so.1", RTLD_NOW);
+        if (handle) {
+            my_aa_gettaskcon = dlsym(handle, "aa_gettaskcon");
+            if (dlerror())
+                my_aa_gettaskcon = 0;
+            my_aa_is_enabled = dlsym(handle, "aa_is_enabled");
+            if (dlerror())
+                my_aa_is_enabled = 0;
+            else
+                apparmor_enabled = my_aa_is_enabled();
+        }
+        tried_load++;
+    }
+    if (my_aa_gettaskcon && apparmor_enabled && my_aa_gettaskcon(current->pid, &context, NULL) >= 0) {
+        out_string(context);
+        free(context);
+        ret = true;
+    }
+    return ret;
+}
+#endif /* WITH_APPARMOR */
+
 /*
  * Print the security context of the current process. This is largely lifted
  * from pr_context from procps ps/output.c
  */
 static void out_scontext(const PROC *current)
 {
-    static void (*my_freecon)(char*) = 0;
-    static int (*my_getpidcon)(pid_t pid, char **context) = 0;
-    static int selinux_enabled = 0;
-    char *context;
+    bool success = false;
+    out_string("`");
 
 #ifdef WITH_SELINUX
-    static int (*my_is_selinux_enabled)(void) = 0;
-    static int tried_load = 0;
-
-    if(!my_getpidcon && !tried_load){
-    void *handle = dlopen("libselinux.so.1", RTLD_NOW);
-    if(handle) {
-	my_freecon = dlsym(handle, "freecon");
-	if(dlerror())
-	    my_freecon = 0;
-	dlerror();
-	my_getpidcon = dlsym(handle, "getpidcon");
-	if(dlerror())
-	    my_getpidcon = 0;
-	my_is_selinux_enabled = dlsym(handle, "is_selinux_enabled");
-	if(dlerror())
-	    my_is_selinux_enabled = 0;
-	else
-	    selinux_enabled = my_is_selinux_enabled();
-    }
-    tried_load++;
-    }
+    success = out_selinux_context(current);
 #endif /* WITH_SELINUX */
 
-    out_string("`");
-    
-    if (my_getpidcon && selinux_enabled && !my_getpidcon(current->pid, &context)) {
-	out_string(context);
-	my_freecon(context);
-    } else {
+#ifdef WITH_APPARMOR
+    success |= out_apparmor_context(current);
+#endif /* WITH_APPARMOR */
+
+    if (!success) {
         FILE *file;
         char path[50];
         char readbuf[BUFSIZ+1];
-	int num_read;
+        int num_read;
         snprintf(path, sizeof path, "/proc/%d/attr/current", current->pid);
         if ( (file = fopen(path, "r")) != NULL) {
             if (fgets(readbuf, BUFSIZ, file) != NULL) {
-		num_read = strlen(readbuf);
-		readbuf[num_read-1] = '\0';
+                num_read = strlen(readbuf);
+                readbuf[num_read-1] = '\0';
                 out_string(readbuf);
             }
-      }
-      out_string("'");
+            fclose(file);
+        }
     }
+    out_string("'");
 }
 
 static void out_newline(void)
@@ -1036,7 +1107,7 @@ static char* get_threadname(const pid_t pid, const int tid, const char *comm)
  * read_proc now uses a similar method as procps for finding the process
  * name in the /proc filesystem. My thanks to Albert and procps authors.
  */
-static void read_proc(void)
+static void read_proc(const pid_t root_pid)
 {
   DIR *dir;
   struct dirent *de;
@@ -1176,7 +1247,7 @@ static void read_proc(void)
     }
   }
   (void) closedir(dir);
-  fix_orphans();
+  fix_orphans(root_pid);
   if (print_args)
     free(buffer);
   if (empty) {
@@ -1192,12 +1263,12 @@ static void read_proc(void)
  * As we cannot be sure if it is just the root pid or others missing
  * we gather the lot
  */
-static void fix_orphans(void)
+static void fix_orphans(const pid_t root_pid)
 {
     PROC *root, *walk;
 
-    if (!(root = find_proc(ROOT_PID))) {
-        root = new_proc("?", ROOT_PID, 0);
+    if (!(root = find_proc(root_pid))) {
+        root = new_proc("?", root_pid, 0);
     }
     for (walk = list; walk; walk = walk->next) {
         if (walk->pid == 1 || walk->pid == 0)
@@ -1263,7 +1334,7 @@ void print_version()
     fprintf(stderr, _("pstree (PSmisc) %s\n"), VERSION);
     fprintf(stderr,
             _
-            ("Copyright (C) 1993-2020 Werner Almesberger and Craig Small\n\n"));
+            ("Copyright (C) 1993-2024 Werner Almesberger and Craig Small\n\n"));
     fprintf(stderr,
             _("PSmisc comes with ABSOLUTELY NO WARRANTY.\n"
               "This is free software, and you are welcome to redistribute it under\n"
@@ -1277,7 +1348,7 @@ int main(int argc, char **argv)
     PROC *current;
     const struct passwd *pw;
     struct ns_entry *nsroot = NULL;
-    pid_t pid, highlight;
+    pid_t pid, highlight, root_pid;
     char termcap_area[1024];
     char *termname, *endptr;
     int c, pid_set = 0;
@@ -1308,7 +1379,8 @@ int main(int argc, char **argv)
     };
 
     output_width = get_output_width();
-    pid = ROOT_PID;
+    root_pid = find_root_pid();
+    pid = root_pid;
     highlight = 0;
     pw = NULL;
 
@@ -1413,7 +1485,6 @@ int main(int argc, char **argv)
             break;
         case 'g':
             pgids = 1;
-            compact = 0;
             break;
         case 's':
             show_parents = 1;
@@ -1456,15 +1527,21 @@ int main(int argc, char **argv)
     }
     if (optind != argc)
         usage();
-    read_proc();
+    read_proc(root_pid);
     for (current = find_proc(highlight); current;
          current = current->parent)
         current->flags |= PFLAG_HILIGHT;
 
     if(show_parents && pid_set == 1) {
-      trim_tree_by_parent(find_proc(pid));
+      PROC *child_proc;
 
-      pid = ROOT_PID;
+      if ( (child_proc = find_proc(pid)) == NULL) {
+	      fprintf(stderr, _("Process %d not found.\n"), pid);
+	      return 1;
+      }
+      trim_tree_by_parent(child_proc);
+
+      pid = root_pid;
     }
 
     if (nsid != NUM_NS) {
@@ -1473,7 +1550,7 @@ int main(int argc, char **argv)
     } else if (!pw)
         dump_tree(find_proc(pid), 0, 1, 1, 1, 0, 0);
     else {
-        dump_by_user(find_proc(ROOT_PID), pw->pw_uid);
+        dump_by_user(find_proc(root_pid), pw->pw_uid);
         if (!dumped) {
             fprintf(stderr, _("No processes found.\n"));
             return 1;

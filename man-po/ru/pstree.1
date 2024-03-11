@@ -11,14 +11,14 @@
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH PSTREE 1 2021\-01\-05 psmisc "Пользовательские команды"
+.TH PSTREE 1 2021\-06\-21 psmisc "Пользовательские команды"
 .SH ИМЯ
 pstree \- показывает дерево процессов
 .SH ОБЗОР
 .ad l
-\fBpstree\fP [\fB\-a\fP,\fB\ \-\-arguments\fP] [\fB\-c\fP,\fB\ \-\-compact\-not\fP] [\fB\-C\fP,\fB\ \-\-color\ \fP\fIattr\fP] [\fB\-g\fP,\fB\ \-\-show\-pgids\fP] [\fB\-h\fP,\fB\ \-\-highlight\-all\fP,\fB\ \-H\fP\fI\ pid\fP,\fB\ \-\-highlight\-pid\ \fP\fIpid\fP] [\fB\-l\fP,\fB\ \-\-long\fP] [\fB\-n\fP,\fB\ \-\-numeric\-sort\fP] [\fB\-N\fP,\fB\ \-\-ns\-sort\ \fP\fIns\fP] [\fB\-p\fP,\fB\ \-\-show\-pids\fP]
+\fBpstree\fP [\fB\-a\fP,\fB\ \-\-arguments\fP] [\fB\-c\fP,\fB\ \-\-compact\-not\fP] [\fB\-C\fP,\fB\ \-\-color\ \fP\fIattr\fP] [\fB\-g\fP,\fB\ \-\-show\-pgids\fP] [\fB\-h\fP,\fB\ \-\-highlight\-all\fP,\fB\ \-H\fP\fIpid\fP,\fB\ \-\-highlight\-pid\ \fP\fIpid\fP] [\fB\-l\fP,\fB\ \-\-long\fP] [\fB\-n\fP,\fB\ \-\-numeric\-sort\fP] [\fB\-N\fP,\fB\ \-\-ns\-sort\ \fP\fIns\fP] [\fB\-p\fP,\fB\ \-\-show\-pids\fP]
 [\fB\-s\fP,\fB\ \-\-show\-parents\fP] [\fB\-S\fP,\fB\ \-\-ns\-changes\fP] [\fB\-t\fP,\fB\ \-\-thread\-names\fP] [\fB\-T\fP,\fB\ \-\-hide\-threads\fP] [\fB\-u\fP,\fB\ \-\-uid\-changes\fP]
-[\fB\-Z\fP,\fB\ \-\-security\-context\fP] [\fB\-A\fP,\fB\ \-\-ascii\fP,\fB\ \-G\fP,\fB\ \-\-vt100\fP,\fB\ \-U\fP,\fB\ \-\-unicode\fP] [\fIpid\fP,\fB\ \fP\fIuser\fP]
+[\fB\-Z\fP,\fB\ \-\-security\-context\fP] [\fB\-A\fP,\fB\ \-\-ascii\fP,\fB\ \-G\fP,\fB\ \-\-vt100\fP,\fB\ \-U\fP,\fB\ \-\-unicode\fP] [\fIpid\fP,\fB\ \fP\fIпользователь\fP]
 .br
 \fBpstree\fP \fB\-V\fP,\fB\ \-\-version\fP
 .ad b
@@ -74,13 +74,14 @@ procfs, скрывают информацию для некоторых проц
 Не сжимать одинаковые поддеревья. По умолчанию поддеревья сжимаются везде
 где возможно.
 .IP \fB\-C\fP
-Color the process name by given attribute. Currently \fBpstree\fP only accepts
-the value \fBage\fP which colors by process age.  Processes newer than 60
-seconds are green, newer than an hour yellow and the remaining red.
+Раскрашивать имена процессов по заданному атрибуту. В настоящее время
+\fBpstree\fP поддерживает только значение \fBage\fP, означающее раскраску по
+возрасту процесса. Процессы новее 60 секунд выводятся зелёными, новее часа —
+жёлтыми, а остальные красными.
 .IP \fB\-g\fP
 Показывать PGID. Идентификаторы групп процесса показываются десятичными
-числами в скобках после каждого имени процесса. \fB\-g\fP неявно отключает
-сжатие. Если выводятся PID и PGID, то PID показывается первым.
+числами в скобках после каждого имени процесса. Если выводятся PID и PGID,
+то PID показываются первыми.
 .IP \fB\-G\fP
 Использовать символы рисования линий от VT100.
 .IP \fB\-h\fP

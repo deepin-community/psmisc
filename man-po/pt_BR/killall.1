@@ -1,6 +1,6 @@
 .\"
 .\" Copyright 1993-2002 Werner Almesberger
-.\"           2002-2021 Craig Small
+.\"           2002-2023 Craig Small
 .\" This program is free software; you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License as published by
 .\" the Free Software Foundation; either version 2 of the License, or
@@ -11,7 +11,7 @@
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH KILLALL 1 2021\-01\-11 psmisc "Comandos de usuário"
+.TH KILLALL 1 2023\-06\-17 psmisc "Comandos de usuário"
 .SH NOME
 killall \- mata processos por nome
 .SH SINOPSE
@@ -23,7 +23,7 @@ killall \- mata processos por nome
 \fITIME\fP] [\fB\-I\fP,\fB\ \-\-ignore\-case\fP] [\fB\-V\fP,\fB\ \-\-version\fP] [\fB\-\-\fP] \fIname\fP
 \&...
 .br
-\fBkillall\fP \-l
+\fBkillall\fP \fB\-l\fP, \fB\-\-list\fP
 .br
 \fBkillall\fP \fB\-V\fP,\fB\ \-\-version\fP
 .ad b
@@ -32,8 +32,8 @@ killall \- mata processos por nome
 dos comandos especificados. Se nenhum nome de sinal for especificado,
 SIGTERM será enviado.
 .PP
-Os sinais podem ser especificados pelo nome (por exemplo, \fB\-HUP\fP ou
-\fB\-SIGHUP\fP) ou por número (por exemplo, \fB\-1\fP) ou pela opção \fB\-s\fP.
+Signals can be specified either by name (e.g.\& \fB\-HUP\fP or \fB\-SIGHUP\fP)  or
+by number (e.g.\& \fB\-1\fP)  or by option \fB\-s\fP.
 .PP
 Se o nome do comando não for uma expressão regular (opção \fB\-r\fP) e contiver
 uma barra (\fB/\fP), os processos que executam aquele arquivo específico serão

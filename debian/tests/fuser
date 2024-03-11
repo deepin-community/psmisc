@@ -1,0 +1,71 @@
+#!/bin/sh
+
+exec 2>&1
+
+test_no_arguments() {
+    ( fuser >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "fuser exit value" "1" "${rtrn}"
+    grep -E '^No process specification given$' "${stderrF}" > /dev/null
+    assertTrue 'error message' $?
+}
+
+test_no_process() {
+    ( fuser "${testF}" >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "fuser exit value" "1" "${rtrn}"
+    assertFalse "unexpected output to stderr" "[ -s '${stderrF}' ]"
+}
+
+test_a_no_process() {
+    ( fuser -a "${testF}" >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "fuser exit value" "1" "${rtrn}"
+    grep -qE "^${testF}:$" "${stderrF}"
+    assertTrue 'File matches no process' $?
+}
+
+test_my_cwd() {
+    myCWD=$(readlink "/proc/${myPID}/cwd" )
+    ( fuser "${myCWD}" >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "fuser exit value" "0" "${rtrn}"
+    grep -qE "${myPID}" "${stdoutF}"
+    assertTrue 'STDOUT has my PID' $?
+    grep -qE "^${myCWD}:.*c" "${stderrF}"
+    assertTrue 'STDERR has my path and c' $?
+}
+
+test_my_exe() {
+    myEXE=$(readlink "/proc/${myPID}/exe" )
+    ( fuser "${myEXE}" >"${stdoutF}" 2>"${stderrF}" )
+    rtrn=$?
+
+    assertEquals "fuser exit value" "0" "${rtrn}"
+    grep -qE "${myPID}" "${stdoutF}"
+    assertTrue 'STDOUT has my PID' $?
+    grep -qE "^${myEXE}:.*e" "${stderrF}"
+    assertTrue 'STDERR has my path and e' $?
+}
+oneTimeSetUp() {
+  # Define global variables for command output.
+  stdoutF="${AUTOPKGTEST_TMP}/stdout"
+  stderrF="${AUTOPKGTEST_TMP}/stderr"
+  testF="${AUTOPKGTEST_TMP}/test-file"
+  touch "${testF}"
+  myPID=$$
+}
+
+setUp() {
+  # Truncate the output files.
+  cp /dev/null "${stdoutF}"
+  cp /dev/null "${stderrF}"
+}
+
+
+# shellcheck disable=SC1091
+. shunit2

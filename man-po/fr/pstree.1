@@ -11,14 +11,14 @@
 .\" This file was generated with po4a. Translate the source file.
 .\"
 .\"*******************************************************************
-.TH PSTREE 1 2021\-01\-05 psmisc "Commandes de l'utilisateur"
+.TH PSTREE 1 2021\-06\-21 psmisc "Commandes de l'utilisateur"
 .SH NOM
 pstree \- afficher un arbre des processus
 .SH SYNOPSIS
 .ad l
 \fBpstree\fP [\fB\-a\fP,\fB\ \-\-arguments\fP] [\fB\-c\fP,\fB\ \-\-compact\-not\fP] [\fB\-C\fP,\fB\ \-\-color\ \fP\fIattr\fP] [\fB\-g\fP,\fB\ \-\-show\-pgids\fP] [\fB\-h\fP,\fB\ \-\-highlight\-all\fP,\fB\ \-H\fP\fI\ pid\fP,\fB\ \-\-highlight\-pid\ \fP\fIpid\fP] [\fB\-l\fP,\fB\ \-\-long\fP] [\fB\-n\fP,\fB\ \-\-numeric\-sort\fP] [\fB\-N\fP,\fB\ \-\-ns\-sort\ \fP\fIns\fP] [\fB\-p\fP,\fB\ \-\-show\-pids\fP]
 [\fB\-s\fP,\fB\ \-\-show\-parents\fP] [\fB\-S\fP,\fB\ \-\-ns\-changes\fP] [\fB\-t\fP,\fB\ \-\-thread\-names\fP] [\fB\-T\fP,\fB\ \-\-hide\-threads\fP] [\fB\-u\fP,\fB\ \-\-uid\-changes\fP]
-[\fB\-Z\fP,\fB\ \-\-security\-context\fP] [\fB\-A\fP,\fB\ \-\-ascii\fP,\fB\ \-G\fP,\fB\ \-\-vt100\fP,\fB\ \-U\fP,\fB\ \-\-unicode\fP] [\fIpid\fP,\fB\ \fP\fIuser\fP]
+[\fB\-Z\fP,\fB\ \-\-security\-context\fP] [\fB\-A\fP,\fB\ \-\-ascii\fP,\fB\ \-G\fP,\fB\ \-\-vt100\fP,\fB\ \-U\fP,\fB\ \-\-unicode\fP] [\fIpid\fP,\fB\ \fP\fIutilisateur\fP]
 .br
 \fBpstree\fP \fB\-V\fP,\fB\ \-\-version\fP
 .ad b
@@ -76,14 +76,14 @@ Utiliser des caractères ASCII pour dessiner l'arbre.
 Désactiver le compactage de sous\-arbres identiques. Par défaut, les
 sous\-arbres sont compactés dès que possible.
 .IP \fB\-C\fP
-Color the process name by given attribute. Currently \fBpstree\fP only accepts
-the value \fBage\fP which colors by process age.  Processes newer than 60
-seconds are green, newer than an hour yellow and the remaining red.
+Colorie le nom du processus avec l'attribut donné. Actuellement, \fBpstree\fP
+accepte uniquement la valeur \fBage\fP qui colorie en fonction de l'age du
+processus.  Les processus plus récents que 60 secondes sont verts, ceux plus
+récents que une heure sont jaunes et les autres sont rouges.
 .IP \fB\-g\fP
 Montrer les PGID. Les ID de groupes de processus sont montrés sous forme de
-nombres décimaux entre parenthèses après le nom du processus.  \fB\-g\fP
-désactive implicitement le compactage.  Si les PID et les PGID sont
-affichés, alors, les PID sont affichés en premier.
+nombres décimaux entre parenthèses après le nom du processus.  Si les PID et
+les PGID sont affichés, alors, les PID sont affichés en premier.
 .IP \fB\-G\fP
 Utiliser les caractères de dessin de lignes du VT100.
 .IP \fB\-h\fP
@@ -132,8 +132,8 @@ et en sort avec \fBecho \-e '\033%@'\fP.
 .IP \fB\-V\fP
 Afficher les informations de version.
 .IP \fB\-Z\fP
-Show the current security attributes of the process. For SELinux systems
-this will be the security context.
+Montrer les attributs de sécurité que le processus possède actuellement.
+Pour les systèmes SELinux, il s'agit du contexte de sécurité.
 .SH FICHIERS
 .TP 
 /proc

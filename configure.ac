@@ -1,9 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ([2.69])
 AC_CONFIG_MACRO_DIR([m4])
-AC_INIT([psmisc],
-	m4_esyscmd([misc/git-version-gen .tarball-version]),
-	,,,[https://www.gitlab.com/psmisc/psmisc])
+AC_INIT([psmisc],[m4_esyscmd(misc/git-version-gen .tarball-version)],[],[],[],[https://www.gitlab.com/psmisc/psmisc])
 AM_INIT_AUTOMAKE([foreign 1.11 subdir-objects -Wall -Wno-portability tar-pax no-dist-gzip dist-xz])
 AM_SILENT_RULES([yes])
 AC_CONFIG_SRCDIR([src/comm.h])
@@ -14,7 +12,6 @@ AC_USE_SYSTEM_EXTENSIONS(_GNU_SOURCE)
 AC_PROG_CXX
 AC_PROG_LN_S
 AC_PROG_CC
-AC_PROG_CC_STDC
 
 AC_DEFUN([PSMISC_PROG_PO4A], [
   AC_REQUIRE([AM_NLS])
@@ -46,31 +43,47 @@ if test "$enable_selinux" = "yes"; then
 fi
 AC_SUBST([DL_LIB])
 
-# Call fork before all stat calls to stop hanging on NFS mounts
-AC_SUBST([WITH_TIMEOUT_STAT])
-AC_ARG_ENABLE([timeout_stat],
-  [AS_HELP_STRING([--enable-timeout-stat], [Use a timeout on stat calls (optional with argument "static" for a static background process)])],
-  [enable_timeout_stat=$enableval],
-  [enable_timeout_stat="no"])
-if test "$enable_timeout_stat" = "yes"; then
-  AC_DEFINE([WITH_TIMEOUT_STAT], [1], [Use timeout on stat calls])
+# AppArmor support - off by default
+DL_LIB=
+AC_SUBST([WITH_AppArmor])
+AC_ARG_ENABLE([apparmor],
+  [AS_HELP_STRING([--enable-apparmor], [Enable AppArmor features])],
+  [enable_apparmor=$enableval],
+  [enable_apparmor="no"])
+if test "$enable_apparmor" = "yes"; then
+  AC_DEFINE([WITH_APPARMOR], [1], [Use AppArmor features])
+  AC_SEARCH_LIBS([dlopen], [dl], [],
+		 [AC_MSG_ERROR([dynamic linking unavailable, circumvent with --disable-apparmor])])
+  AC_CHECK_HEADER([sys/apparmor.h], [],
+		  [AC_MSG_ERROR([Need AppArmor header files, circumvent with --disable-apparmor])])
+  if test "x$ac_cv_search_dlopen" != "xnone required"; then
+      DL_LIB="$ac_cv_search_dlopen"
+  fi
 fi
-if test "$enable_timeout_stat" = "static"; then
-  AC_DEFINE([WITH_TIMEOUT_STAT], [2], [Use timeout on stat calls])
-fi
-AM_CONDITIONAL([WANT_TIMEOUT_STAT], [test "$enable_timeout_stat" = "static"])
+AC_SUBST([DL_LIB])
 
-# Use string search for network based file systems but only if the system
-# has /proc/self/mountinfo
-AC_SUBST([WITH_MOUNTINFO_LIST])
-AC_ARG_ENABLE([mountinfo_list],
-  [AS_HELP_STRING([--enable-mountinfo-list], [Use the list in /proc/self/mountinfo to replace stat(2) syscall on network file systems shares])],
-  [enable_mountinfo_list="yes"],
-  [enable_mountinfo_list="no"])
-if test "$enable_mountinfo_list" = "yes" -a -e /proc/self/mountinfo ; then
-  AC_DEFINE([WITH_MOUNTINFO_LIST], [1], [Use list in /proc/self/mountinfo to replace stat calls])
-fi
+AC_CHECK_DECLS([SYS_statx],
+  [has_syscall_statx="yes"],
+  [has_syscall_statx="no"],
+  [[#include <sys/syscall.h>]]
+)
 
+# Check for linux specific statx(2) system call
+AC_CHECK_HEADERS([sys/syscall.h])
+AC_CHECK_FUNCS([statx])
+AC_CHECK_DECLS([STATX_TYPE])
+
+AC_SUBST([WITH_STATX])
+AC_ARG_ENABLE([statx],
+  [AS_HELP_STRING([--disable-statx], [Do not use linux specific statx(2) system call as replacement for stat(2), lstat(2), and fstat(2)])],
+  [], [enable_statx="yes"])
+if test "$enable_statx" = "yes"; then
+  AC_DEFINE([WITH_STATX], [1], [Use statx system call])
+  if test "$has_syscall_statx" = "no" && "$have_statx" = "no"; then
+      AC_MSG_ERROR([statx() and SYS_statx not found, use --disable-statx to not use statx])
+  fi
+ fi
+ 
 # Enable hardened compile and link flags
 AC_ARG_ENABLE([harden_flags],
   [AS_HELP_STRING([--disable-harden-flags], [disable hardened compilier and linker flags])],
@@ -99,7 +112,7 @@ AC_SUBST([TERMCAP_LIB])
 
 dnl Checks for header files.
 AC_HEADER_DIRENT
-AC_HEADER_STDC
+
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h langinfo.h libintl.h limits.h locale.h mntent.h netdb.h netinet/in.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h])
 
@@ -128,7 +141,7 @@ AC_SUBST([HARDEN_CFLAGS])
 AC_SUBST([HARDEN_LDFLAGS])
 
 dnl Check for language stuff
-AM_GNU_GETTEXT_VERSION([0.19.3])
+AM_GNU_GETTEXT_VERSION([0.21])
 AM_GNU_GETTEXT([external])
 
 dnl Must be after the gettext stuff as it sets build_cpu
@@ -200,14 +213,14 @@ AC_FUNC_MALLOC
 AC_FUNC_MEMCMP
 AC_FUNC_REALLOC
 AC_FUNC_STAT
-AC_CHECK_FUNCS([atexit getmntent memset nl_langinfo rawmemchr regcomp rpmatch setlocale socket strcasecmp strchr strdup strerror strpbrk strrchr strtoul])
+AC_CHECK_FUNCS([atexit getmntent memset nl_langinfo regcomp rpmatch setlocale socket strcasecmp strchr strdup strerror strpbrk strrchr strtoul])
 
 dnl Checks for Large File System
 AC_SYS_LARGEFILE
 
 if test x"$DEJAGNU" = x
 then
-  DEJAGNU="\$(top_srcdir)/testsuite/global-conf.exp"
+  DEJAGNU="/dev/null"
 fi
 AC_SUBST(DEJAGNU)
 	

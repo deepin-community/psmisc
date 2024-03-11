@@ -1,6 +1,7 @@
 #!/usr/bin/make -f
 DEB_HOST_ARCH_OS ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 
+
 ifeq ($(DEB_BUILD_ARCH_OS),linux)
 CONFIGURE_FLAGS = --enable-selinux
 endif
@@ -10,12 +11,12 @@ endif
 
 override_dh_auto_configure:
 	dh_auto_configure -- ${CONFIGURE_FLAGS}
+	# Tell blhc to ignore the signal name extraction
+	@echo 'blhc: ignore-line-regexp: .*gcc -E -dM src/signames.c.*'
 
 override_dh_auto_install:
 	dh_auto_install
-	if [ -f "debian/psmisc/usr/bin/fuser" ] ; then \
-	  mv debian/psmisc/usr/bin/fuser debian/psmisc/bin/fuser ; \
-	else \
+	if [ ! -f "debian/psmisc/usr/bin/fuser" ] ; then \
 	  rm -f debian/psmisc/usr/share/man/man1/fuser.1 ; \
 	fi
 	if [ "$(DEB_HOST_ARCH_OS)" = "kfreebsd" ] ; then \
